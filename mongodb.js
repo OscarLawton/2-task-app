@@ -125,13 +125,28 @@ MongoClient.connect(connectionURL, {useNewUrlParser: true, useUnifiedTopology: t
         console.log(error)
     }) */
     // Update Challenge
-    db.collection('tasks').updateMany({
+    /* db.collection('tasks').updateMany({
         completed: false
     }, {
         $set: {
             completed: true
         }
     }).then((result) => {
+        console.log(result)
+    }).catch((error) => {
+        console.log(error)
+    }) */
+
+    // Delete
+    // Delete
+   /*  db.collection('users').deleteMany({age: 14}).then((result) => {
+        console.log(result)
+    }).catch((error) => {
+        console.log(error)
+    }) */
+
+    // Delete Challenge 
+    db.collection('tasks').deleteOne({description: "wash dishes"}).then((result) => {
         console.log(result)
     }).catch((error) => {
         console.log(error)
