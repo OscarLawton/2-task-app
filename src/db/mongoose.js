@@ -30,29 +30,51 @@ const User = mongoose.model('User', {
                 throw new Error('Age must be a postive number')
             }
         }
+    },
+    password: {
+        type: String,
+        required: true,
+        trim: true,
+        validate(value){
+            if(value.length < 7){
+                throw new Error('Password must be greater than 6 characters.')
+            }
+            if(value === 'password'){
+                throw new Error('Password must be something other than: password')
+            }
+        }
     }
 })
 
-const me = new User({
-    name: "  Greg  ", 
-    email: "greg@ZSUM.IO" 
+/* const me = new User({
+    name: "  lake  ", 
+    email: "lake@ZSUM.IO",
+    age: 22,
+    password: '    password    '
 })
 
 me.save().then(() => {
     console.log(me)
 }).catch((error) => {
     console.log('Error', error)
+}) */
+
+const Task = new mongoose.model('Task', {
+    description: { 
+        type: String,
+        required: true,
+        trim: true,
+    },
+    completed: { 
+        type: Boolean,
+        default: false,
+    }
 })
 
-/* const Task = new mongoose.model('Task', {
-    description: { type: String},
-    completed: { type: Boolean}
-})
-
-const task = new Task({description: "wash dishes", completed: false})
+const task = new Task({description: "   clean clothes    "})
 
 task.save().then(() => {
     console.log(task)
 }).catch((error) => {
     console.log(error)
-}) */
+}) 
