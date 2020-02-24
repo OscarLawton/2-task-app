@@ -1,18 +1,22 @@
 const express = require('express');
 const User = require('../models/user');
 const auth = require('./middleware/auth');
+const multer = require('multer');
 const router = new express.Router();
 
+const upload = multer({
+    dest: 'avatars'
+});
 router.post('/users', async (req, res) => {
-    const user = new User(req.body)
+    const user = new User(req.body);
   
     // Async-Await
     try{
-        await user.save()
-        const token = await user.generateAuthToken()
-        res.status(201).send({user, token})
+        await user.save();
+        const token = await user.generateAuthToken();
+        res.status(201).send({user, token});
     } catch(e){
-        res.status(400).send(e)
+        res.status(400).send(e);
     }
     // Promise
    /*  user.save().then(() => {
@@ -24,14 +28,42 @@ router.post('/users', async (req, res) => {
 })
 
 router.post('/users/login', async (req, res) => {
-    try{
-        const user = await User.findByCredentials(req.body.email, req.body.password);
-        const token = await user.generateAuthToken()
 
-        res.send({user, token});
+    try{
+    
+        const user = await User.findByCredentials(req.body.email, req.body.password);
+        const token = await user.generateAuthToken();
+        
+        res.send( { user, token });
     } catch(e){
-        console.log('4')
+        
         res.status(400).send(e)
+    }
+})
+
+router.post('/users/logout', auth, async (req, res) => {
+    console.log(req.user.tokens)
+    try{
+        req.user.tokens = req.user.tokens.filter((token) => {
+            return token.token !== req.token
+        })
+        await req.user.save()
+        res.send()
+    } catch(e){
+        res.status(500).send()
+    }
+})
+
+router.post('/users/logoutall', auth, async (req, res) => {
+    console.log('did this run 222')
+    try{
+        console.log(req.user.tokens)
+        req.user.tokens = []
+        await req.user.save()
+        res.send()
+    } catch(e){
+        console.log(e)
+        res.status(500).send(e)
     }
 })
 
@@ -60,7 +92,7 @@ router.get('/users/:id', async (req, res) => {
     }) */
 })
 
-router.patch('/users/:id', async (req, res) => {
+router.patch('/users/me', auth, async (req, res) => {
     console.log('1')
     const updates = Object.keys(req.body)
     const allowedUpdates = ['name', 'email', 'password', 'age']
@@ -75,9 +107,11 @@ router.patch('/users/:id', async (req, res) => {
     }
     try{
         console.log('4')
-        const user = await User.findById(req.params.id)
+        console.log(req.user._id);
+    
+        const user = req.user;
         updates.forEach((update) => {
-            console.log('5')
+            
             user[update] = req.body[update]
         })
         console.log('6')
@@ -91,16 +125,23 @@ router.patch('/users/:id', async (req, res) => {
         console.log('9')
         res.send(user)
     } catch(e){
-        res.status(400).send(e)
+        res.status(400).send(e);
     }
-})
+});
 
-router.delete('/users/:id', async (req, res) => {
+router.post('/users/me/avatar', auth, upload.single('avatar'), (req, res) =>{
+    res.send("success!");
+});
+
+router.delete('/users/me', auth,  async (req, res) => {
 
     try{
-        await User.findByIdAndDelete(req.params.id)
-        console.log("user deleted!")
-        res.send("deleted!")
+      /*   const user = await User.findByIdAndDelete(req.user._id)
+        if(!user){
+            return res.status(404).send()
+        } */
+        await req.user.remove()
+        res.send(req.user)
     } catch(e){
         console.log(e)
         res.status(500).send()

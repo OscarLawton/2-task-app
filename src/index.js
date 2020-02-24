@@ -3,24 +3,22 @@ require('./db/mongoose')
 var path = require('path');
 const userRouter = require('./routers/user')
 const taskRouter = require('./routers/task')
-const Task = require('./models/task') 
 const app = express()
 const port = process.env.PORT || 3000
 
-/* app.use((req, res, next) => {
-    if(req.method === 'GET'){
-        res.send('get no allowed')
-    } else {
-        next()
-    }
-}) */
+const multer = require('multer');
+const upload = multer({
+    dest: 'images'
+})
+app.post('/upload', upload.single('upload'), (req, res) =>{
+    res.send();
+})
+
 
 
 app.use(express.json())
 app.use(userRouter)
 app.use(taskRouter)
-
-
 
 app.set("view engine", "ejs");
 app.set('views', path.join(__dirname, 'views'));
@@ -39,14 +37,16 @@ app.listen(port, () => {
     console.log('Server is up on port' + port)
 })
 
-/* const jwt = require('jsonwebtoken')
-const myFunction = async () => {
-
-    const token = jwt.sign({ _id: 'abc123' }, 'thisismynewcourse', {expiresIn: '1 hour'});
-    console.log(token)
-
-    const data = jwt.verify(token, 'thisismynewcourse')
-    console.log(data);
+/* const Task = require('./models/task');
+const User = require('./models/user');
+const main = async () => {
+    const task = await Task.findById('5e5150e44ff3b40edb694535')
+    await task.populate('owner').execPopulate();
+    
+    console.log(task.owner )
+    const user = await User.findById('5e514d6dc81b430dd99dbeeb');
+    await user.populate('tasks').execPopulate();
+    
 }
 
-myFunction()  */
+main() */
