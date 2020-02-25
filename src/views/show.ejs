@@ -1,0 +1,7 @@
+<% include ./partials/header %>
+
+    <h1><%= user.name %></h1>
+    <% if(buff !== undefined){ %>
+        <img src="data:image/jpg;base64, <%= buff %>">
+    <% } %>
+<% include ./partials/footer %>

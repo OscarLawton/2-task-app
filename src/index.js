@@ -3,6 +3,7 @@ require('./db/mongoose')
 var path = require('path');
 const userRouter = require('./routers/user')
 const taskRouter = require('./routers/task')
+const Task = require('./models/task')
 const app = express()
 const port = process.env.PORT || 3000
 
@@ -27,6 +28,7 @@ app.use('/', async (req, res) =>{
     try{
         const tasks = await Task.find({})
         res.render('index', {tasks});
+       
     } catch(e){
         res.status(500).send()
     }
