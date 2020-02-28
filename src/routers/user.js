@@ -2,7 +2,8 @@ const express = require('express');
 const User = require('../models/user');
 const auth = require('./middleware/auth');
 const multer = require('multer');
-const sharp = require('sharp')
+const sharp = require('sharp');
+const { sendWelcomeEmail, sendGoodbyeEmail } = require('../email/account');
 const router = new express.Router();
 
 const upload = multer({
@@ -30,6 +31,7 @@ router.post('/users', async (req, res) => {
     // Async-Await
     try{
         await user.save();
+        sendWelcomeEmail(user.email, user.name)
         const token = await user.generateAuthToken();
         res.status(201).send({user, token});
     } catch(e){
@@ -85,9 +87,17 @@ router.post('/users/logoutall', auth, async (req, res) => {
 })
 
 router.get('/users/me', auth, async (req, res) => {
-    const buff = Buffer.from(req.user.avatar).toString('base64');
-    const user = req.user;
-    res.render('show', {user, buff}); 
+    if(!req.user.avatar){
+        const user = req.user;
+        res.send( {user} ); 
+    }
+    else {
+        const buff = Buffer.from(req.user.avatar).toString('base64');
+        const user = req.user;
+        res.render('show', {user, buff}); 
+    }
+    
+   
 })
 
 router.get('/users/:id', async (req, res) => {
@@ -201,8 +211,10 @@ router.delete('/users/me', auth,  async (req, res) => {
         if(!user){
             return res.status(404).send()
         } */
-        await req.user.remove()
-        res.send(req.user)
+        sendGoodbyeEmail(req.user.email, req.user.name);
+        await req.user.remove();
+        
+        res.send(req.user);
     } catch(e){
         console.log(e)
         res.status(500).send()
