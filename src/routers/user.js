@@ -152,7 +152,7 @@ router.patch('/users/me', auth, async (req, res) => {
             return res.status(404).send()
         } 
         console.log('9')
-        res.send(user)
+        res.send(user);
     } catch(e){
         res.status(400).send(e);
     }

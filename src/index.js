@@ -3,9 +3,9 @@ require('./db/mongoose')
 var path = require('path');
 const userRouter = require('./routers/user')
 const taskRouter = require('./routers/task')
-const Task = require('./models/task')
-const app = express()
-const port = process.env.PORT || 3000
+const Task = require('./models/task');
+const app = express();
+const port = process.env.PORT;
 
 const multer = require('multer');
 const upload = multer({
@@ -36,7 +36,7 @@ app.use('/', async (req, res) =>{
 })
 
 app.listen(port, () => {
-    console.log('Server is up on port' + port)
+    console.log('Server is up on port ' + port)
 })
 
 /* const Task = require('./models/task');
